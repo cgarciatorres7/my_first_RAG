@@ -3,6 +3,8 @@ from pytubefix.cli import on_progress
 from src.config.directories import directories
 from pydub import AudioSegment
 import whisper
+from typing import List
+import numpy as np
 
 
 def download_audio(url: str)-> str:
@@ -19,16 +21,27 @@ def clip_audio_file(audio:str, time:int = 20):
     audio = AudioSegment.from_file(directories.raw / str(audio + ".m4a"), "m4a")
 
     total_duration = len(audio)
-    all_clips = []
-
+    files = []
     for i in range(0, total_duration, seconds):
-        audio_clip = audio[i:i+seconds]
-        all_clips.append(audio_clip)
+        file_handle = audio[i : i + seconds].export(directories.processed / f'audio_{i}.wav', format='wav')
+        files.append(file_handle.name)
 
-    return all_clips
+    return files
 
+def transcribe_audio(clips: List[str])-> List[str]:
+    model = whisper.load_model("base")
+    texts = []
+
+    for clip in clips:
+        text = model.transcribe(clip)["text"]
+        texts.append(text)
+    return texts
 
 
 if __name__ == "__main__":
-    audio = download_audio("https://www.youtube.com/watch?v=CWeSzhJpJ9U")
+    audio = download_audio("https://www.youtube.com/watch?v=IELMSD2kdmk")
     clips = clip_audio_file(audio)
+    transcriptions = transcribe_audio(clips)
+
+    for idx, text in enumerate(transcriptions):
+        print(f"Clip {idx+1}: {text}")
