@@ -1,16 +1,17 @@
+from langchain_community.vectorstores import Pinecone
 from pytubefix import YouTube
 from pytubefix.cli import on_progress
 from src.config.directories import directories
 from pydub import AudioSegment
 import whisper
 from typing import List, Dict
-from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
-
+import pinecone
 import os
-import requests
+from dotenv import load_dotenv
 
-model = SentenceTransformer("all-MiniLM-L6-v2") # Reads HF_TOKEN from env
+load_dotenv()
+# Reads HF_TOKEN from env
 
 
 def download_audio(url: str)-> Dict:
@@ -57,13 +58,26 @@ def create_embeddings(transcript_list: List[Dict]) -> List[List[float]]:
     texts = [d["text"] for d in transcript_list]
 
     # Generate embeddings
+    model = SentenceTransformer("all-MiniLM-L6-v2")
     return model.encode(texts).tolist()
+
+
+def create_vector_database(embeddings: List[List[float]]):
+    #todo finish vector database
+    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"), environment="us-west1-gcp")
+    if "embeddings" not in pinecone.list_indexes():
+        pc.create_index("audio-embeddings", dimension=384)
+
+    index = pc.Index("embeddings")
+    index.upsert(items=embeddings)
+
 
 if __name__ == "__main__":
     audio_dict = download_audio("https://www.youtube.com/watch?v=IELMSD2kdmk")
     clips = clip_audio_file(audio_dict["video_name"], audio_dict["id"])
     transcriptions = transcribe_audio(clips)
     embeddings = create_embeddings(transcriptions)
+    create_vector_database(embeddings)
 
     print("Embeddings Created")
 
