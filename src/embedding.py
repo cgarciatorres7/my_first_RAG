@@ -3,11 +3,17 @@ from pytubefix.cli import on_progress
 from src.config.directories import directories
 from pydub import AudioSegment
 import whisper
-from typing import List
-import numpy as np
+from typing import List, Dict
+from dotenv import load_dotenv
+from sentence_transformers import SentenceTransformer
+
+import os
+import requests
+
+model = SentenceTransformer("all-MiniLM-L6-v2") # Reads HF_TOKEN from env
 
 
-def download_audio(url: str)-> dict:
+def download_audio(url: str)-> Dict:
     yt = YouTube(url, on_progress_callback=on_progress)
     print(yt.title)
 
@@ -16,7 +22,7 @@ def download_audio(url: str)-> dict:
 
     return {"video_name" : yt.title, "id" : yt.video_id}
 
-def clip_audio_file(audio:str, id:str, time:int = 20)-> List[dict]:
+def clip_audio_file(audio:str, id:str, time:int = 20)-> List[Dict]:
     seconds = time * 1000
     audio = AudioSegment.from_file(directories.raw / str(audio + ".m4a"), "m4a")
 
@@ -35,9 +41,8 @@ def clip_audio_file(audio:str, id:str, time:int = 20)-> List[dict]:
 
     return files
 
-def transcribe_audio(clips: List[dict])-> List[dict]:
+def transcribe_audio(clips: List[Dict])-> List[Dict]:
     model = whisper.load_model("base")
-    texts = []
 
     for clip in clips:
         text = model.transcribe(clip["file_path"])["text"]
@@ -45,10 +50,20 @@ def transcribe_audio(clips: List[dict])-> List[dict]:
     return clips
 
 
+def create_embeddings(transcript_list: List[Dict]) -> List[List[float]]:
+    """Generate embeddings locally using sentence-transformers."""
+
+    # Extract text from dictionary
+    texts = [d["text"] for d in transcript_list]
+
+    # Generate embeddings
+    return model.encode(texts).tolist()
+
 if __name__ == "__main__":
     audio_dict = download_audio("https://www.youtube.com/watch?v=IELMSD2kdmk")
     clips = clip_audio_file(audio_dict["video_name"], audio_dict["id"])
     transcriptions = transcribe_audio(clips)
+    embeddings = create_embeddings(transcriptions)
 
-    for idx, text in enumerate(transcriptions):
-        print(f"Clip {idx+1}: {text}")
+    print("Embeddings Created")
+
