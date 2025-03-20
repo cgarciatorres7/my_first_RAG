@@ -1,4 +1,4 @@
-from langchain_community.vectorstores import Pinecone
+
 from pytubefix import YouTube
 from pytubefix.cli import on_progress
 from src.config.directories import directories
@@ -6,12 +6,13 @@ from pydub import AudioSegment
 import whisper
 from typing import List, Dict
 from sentence_transformers import SentenceTransformer
-import pinecone
-import os
+from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 # Reads HF_TOKEN from env
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 
 
 def download_audio(url: str)-> Dict:
@@ -62,14 +63,48 @@ def create_embeddings(transcript_list: List[Dict]) -> List[List[float]]:
     return model.encode(texts).tolist()
 
 
-def create_vector_database(embeddings: List[List[float]]):
-    #todo finish vector database
-    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"), environment="us-west1-gcp")
-    if "embeddings" not in pinecone.list_indexes():
-        pc.create_index("audio-embeddings", dimension=384)
+def format_embeddings(embeddings, metadata_list=None):
+    """
+    Converts a list of embeddings into the required format for Pinecone upsert.
 
-    index = pc.Index("embeddings")
-    index.upsert(items=embeddings)
+    :param embeddings: List of embedding vectors (each is a list of floats).
+    :param ids: List of unique IDs corresponding to each embedding.
+    :param metadata_list: (Optional) List of metadata dictionaries, one per embedding.
+    :return: List of formatted dictionaries.
+    """
+    formatted_vectors = []
+
+    for i, embedding in enumerate(embeddings):
+        vector_data = {
+            "id": f"{i}",
+            "values": embedding
+        }
+
+        if metadata_list and i < len(metadata_list):
+            vector_data["metadata"] = metadata_list[i]
+
+        formatted_vectors.append(vector_data)
+
+    return formatted_vectors
+
+
+def create_vector_database(embeddings: List[Dict]):
+    #todo finish vector database
+    # Initialize Pinecone
+
+    pc = Pinecone(PINECONE_API_KEY)
+    index_name = "audio-embeddings"
+    if not pc.has_index(index_name):
+        pc.create_index(name=index_name, dimension=384, metric="cosine", spec=ServerlessSpec("aws", "us-east-1"))
+
+    # Initialize index client
+    index = pc.Index(name=index_name)
+
+    # View index stats
+    index.describe_index_stats()
+    index.upsert(embeddings)
+
+    print("Creating vector database Successful")
 
 
 if __name__ == "__main__":
@@ -77,7 +112,8 @@ if __name__ == "__main__":
     clips = clip_audio_file(audio_dict["video_name"], audio_dict["id"])
     transcriptions = transcribe_audio(clips)
     embeddings = create_embeddings(transcriptions)
-    create_vector_database(embeddings)
+    formated_embeddings = format_embeddings(embeddings)
+    create_vector_database(formated_embeddings)
 
     print("Embeddings Created")
 
