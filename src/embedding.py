@@ -6,7 +6,6 @@ from pydub import AudioSegment
 import whisper
 from typing import List, Dict
 from sentence_transformers import SentenceTransformer
-from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
 import os
 
@@ -104,16 +103,20 @@ def create_vector_database(embeddings: List[Dict]):
     index.describe_index_stats()
     index.upsert(embeddings)
 
-    print("Creating vector database Successful")
+    print("Creating vector database Successful")   
 
-
-if __name__ == "__main__":
-    audio_dict = download_audio("https://www.youtube.com/watch?v=IELMSD2kdmk")
+def process_video(input_video: str) -> None:
+    
+    audio_dict = download_audio(input_video)
     clips = clip_audio_file(audio_dict["video_name"], audio_dict["id"])
     transcriptions = transcribe_audio(clips)
     embeddings = create_embeddings(transcriptions)
     formated_embeddings = format_embeddings(embeddings)
     create_vector_database(formated_embeddings)
-
+    
     print("Embeddings Created")
+    
 
+
+if __name__ == "__main__":
+    process_video("https://www.youtube.com/watch?v=IELMSD2kdmk")
