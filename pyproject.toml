@@ -1,0 +1,20 @@
+[project]
+name = "my_first_rag"
+version = "0.1.0"
+description = "A RAG system for processing YouTube videos"
+requires-python = ">=3.8"
+dependencies = [
+    "pytubefix",
+    "pydub",
+    "openai-whisper",
+    "sentence-transformers",
+    "python-dotenv",
+    "pinecone-client",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+pythonpath = ["."] 

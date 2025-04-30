@@ -1,13 +1,13 @@
-
+import whisper
+from typing import List, Dict
+import os
+from dotenv import load_dotenv
+from sentence_transformers import SentenceTransformer
+from pydub import AudioSegment
 from pytubefix import YouTube
 from pytubefix.cli import on_progress
 from src.config.directories import directories
-from pydub import AudioSegment
-import whisper
-from typing import List, Dict
-from sentence_transformers import SentenceTransformer
-from dotenv import load_dotenv
-import os
+from pinecone import Pinecone, ServerlessSpec
 
 load_dotenv()
 # Reads HF_TOKEN from env
@@ -115,8 +115,7 @@ def process_video(input_video: str) -> None:
     create_vector_database(formated_embeddings)
     
     print("Embeddings Created")
-    
-
 
 if __name__ == "__main__":
     process_video("https://www.youtube.com/watch?v=IELMSD2kdmk")
+    
