@@ -19,7 +19,6 @@ api_key = os.environ.get('PINECONE_API_KEY') or 'PINECONE_API_KEY'
 pc = Pinecone(api_key=api_key)
 
 
-
 def query_pinecone(query: str):
     # configure index
     index_name = "audio-embeddings"
