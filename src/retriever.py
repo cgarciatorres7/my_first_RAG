@@ -1,9 +1,9 @@
-
-
 import os
 from pinecone import Pinecone
 from sentence_transformers import SentenceTransformer
 import torch
+from langchain_core.prompts import PromptTemplate
+
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -32,17 +32,40 @@ def query_pinecone(query: str):
 def get_transcriptions(xc: dict):
     return xc["matches"]
 
-def get_audio_url(xc: dict):
-    return xc["matches"][0]["metadata"]["audio_url"]
+def get_rag_response(query: str, model_name: str = "gpt-3.5-turbo") -> str:
+    """
+    Simple RAG function that:
+    1. Retrieves relevant context from Pinecone
+    2. Creates a prompt with the context
+    3. Gets a response from the LLM
+    """
+    # Get relevant documents from Pinecone
+    results = query_pinecone(query)
+    transcriptions = get_transcriptions(results)
+    
+    # Combine all relevant transcriptions
+    context = "\n".join([t["metadata"]["text"] for t in transcriptions])
+    
+    # Create prompt template
+    prompt_template = """
+    Answer the question based on the following context from a video transcript.
+    If you cannot answer the question based on the context, say "I cannot answer this based on the video content."
+    
+    Context: {context}
+    
+    Question: {question}
+    
+    Answer: """
+    
+    prompt = PromptTemplate(
+        template=prompt_template,
+        input_variables=["context", "question"]
+    )  
+    
+    # Get LLM response
+    llm = OpenAI(temperature=0, model_name=model_name)
+    final_prompt = prompt.format(context=context, question=query)
+    response = llm(final_prompt)
+    
+    return response
 
-def get_audio_id(xc: dict):
-    return xc["matches"][0]["metadata"]["audio_id"]
-
-def get_audio_time(xc: dict):
-    return xc["matches"][0]["metadata"]["audio_time"]
-
-def get_audio_transcription(xc: dict):
-    return xc["matches"][0]["metadata"]["audio_transcription"]
-
-def get_audio_transcription_time(xc: dict):
-    return xc["matches"][0]["metadata"]["audio_transcription_time"]
