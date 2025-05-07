@@ -18,7 +18,7 @@ if st.button("Ask a question"):
                 transcriptions = get_transcriptions(xc)
                 st.write(transcriptions)
         
-    except KeyError as e:
-        st.warning("Please enter a YouTube URL in the search page first")
+    except:
+        st.error("Please enter a YouTube URL in the search page first")
 
 

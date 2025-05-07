@@ -24,8 +24,10 @@ def get_video_title(url: str) -> str:
     
 
 st.header("Here's project :blue[Oppenheimer]: A YouTube Search tool with NLP. :sunglasses:")
-
 st.write("How to use: Select a youtube video, then ask any question about the video")
+
+if st.session_state.show_ask_page:
+    st.switch_page("pages/ask_questions.py")
 
 # Input for YouTube URL
 youtube_url = st.text_input("Enter YouTube video URL")
@@ -43,8 +45,11 @@ process_video_button = st.button("Process Video", disabled=botton_apagado)
 
 if process_video_button:
     with st.spinner("Processing video..."):
-        process_video(youtube_url)
-        st.session_state.show_ask_page = True
-        st.success("Video processed! You can now go to the Ask Questions page.")
+        #process_video(youtube_url)
+        print("Finished")
+    
+    st.session_state.show_ask_page = True
+    st.success("Video processed! You can now go to the Ask Questions page.")
         # Redirect to ask_questions page
-        st.switch_page("pages/ask_questions.py")
+    st.rerun()
+
