@@ -9,6 +9,7 @@ from pytubefix.cli import on_progress
 from src.config.directories import directories
 from pinecone import Pinecone, ServerlessSpec
 
+
 load_dotenv()
 # Reads HF_TOKEN from env
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
@@ -115,6 +116,7 @@ def process_video(input_video: str) -> None:
     create_vector_database(formated_embeddings)
     
     print("Embeddings Created")
+    return 1
 
 if __name__ == "__main__":
     process_video("https://www.youtube.com/watch?v=IELMSD2kdmk")
