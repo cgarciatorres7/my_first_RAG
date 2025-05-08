@@ -25,12 +25,12 @@ def get_video_title(url: str) -> str:
 
 st.header("Here's project :blue[Oppenheimer]: A YouTube Search tool with NLP. :sunglasses:")
 st.write("How to use: Select a youtube video, then ask any question about the video")
+youtube_url = st.text_input("Enter YouTube video URL")
 
-if st.session_state.show_ask_page:
+if st.session_state.show_ask_page and youtube_url:
     st.switch_page("pages/ask_questions.py")
 
 # Input for YouTube URL
-youtube_url = st.text_input("Enter YouTube video URL")
 if youtube_url != "":
     video_title = get_video_title(youtube_url)
 
