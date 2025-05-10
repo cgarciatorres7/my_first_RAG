@@ -47,7 +47,7 @@ def transcribe_audio(clips: List[Dict])-> List[Dict]:
     model = whisper.load_model("base")
 
     for clip in clips:
-        text = model.transcribe(clip["file_path"])["text"]
+        text = model.transcribe(clip["file_path"], fp16=False)["text"]
         clip["text"] = text
     return clips
 
@@ -77,7 +77,8 @@ def format_embeddings(embeddings, metadata_list=None):
     for i, embedding in enumerate(embeddings):
         vector_data = {
             "id": f"{i}",
-            "values": embedding
+            "values": embedding,
+            "metadata": metadata_list[i]
         }
 
         if metadata_list and i < len(metadata_list):
@@ -112,11 +113,13 @@ def process_video(input_video: str) -> None:
     clips = clip_audio_file(audio_dict["video_name"], audio_dict["id"])
     transcriptions = transcribe_audio(clips)
     embeddings = create_embeddings(transcriptions)
-    formated_embeddings = format_embeddings(embeddings)
+    formated_embeddings = format_embeddings(embeddings, transcriptions)
     create_vector_database(formated_embeddings)
     
     print("Embeddings Created")
-    return 1
+    
+    return input_video
+
 
 if __name__ == "__main__":
     process_video("https://www.youtube.com/watch?v=IELMSD2kdmk")

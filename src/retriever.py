@@ -2,18 +2,13 @@ import os
 import torch
 from pinecone import Pinecone
 from sentence_transformers import SentenceTransformer
-from langchain_core.prompts import PromptTemplate
 #from langchain_openai import OpenAI
 
 # Initialize PyTorch
 torch.set_num_threads(1)  # Limit PyTorch to use only one thread
 device = 'cpu'  # Always use CPU
 
-retriever = SentenceTransformer(
-    'flax-sentence-embeddings/all_datasets_v3_mpnet-base',
-    device=device
-)
-
+model = SentenceTransformer("all-MiniLM-L6-v2")
 # initialize connection to pinecone (get API key at app.pinecone.io)
 api_key = os.environ.get('PINECONE_API_KEY') or 'PINECONE_API_KEY'
 
@@ -26,15 +21,13 @@ def query_pinecone(query: str):
     index_name = "audio-embeddings"
     index = pc.Index(index_name)
 
-    xq = retriever.encode([query]).tolist()
+    xq = model.encode([query]).tolist()
     # now query
-    xc = index.query(vector=xq, top_k=5, include_metadata=True)
-    return xc
+    query_results = index.query(vector=xq, top_k=3, include_metadata=True)
+    return query_results
 
-def get_transcriptions(xc: dict):
-    return xc["matches"]
 
-def get_rag_response(query: str, model_name: str = "gpt-3.5-turbo") -> str:
+def rag_promt(query: str, query_results: str) -> str:
     """
     Simple RAG function that:
     1. Retrieves relevant context from Pinecone
@@ -42,12 +35,9 @@ def get_rag_response(query: str, model_name: str = "gpt-3.5-turbo") -> str:
     3. Gets a response from the LLM
     """
     # Get relevant documents from Pinecone
-    results = query_pinecone(query)
-    transcriptions = get_transcriptions(results)
-    
-    # Combine all relevant transcriptions
-    context = "\n".join([t["metadata"]["text"] for t in transcriptions])
-    
+    context = [
+        x.metadata['text'] for x in query_results.matches
+    ]
     # Create prompt template
     prompt_template = """
     Answer the question based on the following context from a video transcript.
@@ -55,19 +45,31 @@ def get_rag_response(query: str, model_name: str = "gpt-3.5-turbo") -> str:
     
     Context: {context}
     
-    Question: {question}
+    Question: {query}
     
     Answer: """
     
-    prompt = PromptTemplate(
-        template=prompt_template,
-        input_variables=["context", "question"]
-    )  
+    return prompt_template.format(context=context, query=query)
+
+
+def chat_completion(prompt):
+    from openai import OpenAI
+
+    # Get OpenAI api key from platform.openai.com
+    openai_api_key = os.getenv('OPENAI_API_KEY')
+
+    # Instantiate the OpenAI client
+    client = OpenAI(api_key=openai_api_key)
     
-    # Get LLM response
-    #llm = OpenAI(temperature=0, model_name=model_name)
-    #final_prompt = prompt.format(context=context, question=query)
-    #response = llm(final_prompt)
-    
-    return "Hello World"
+    # Instructions
+    sys_prompt = "You are a helpful assistant that always answers questions."
+    res = client.chat.completions.create(
+        model='gpt-4o-mini-2024-07-18',
+        messages=[
+            {"role": "system", "content": sys_prompt},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0
+    )
+    return res.choices[0].message.content.strip()
 

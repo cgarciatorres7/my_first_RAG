@@ -21,9 +21,10 @@ ask_question_input = st.text_input("Ask a question about the video", key="name2"
 if st.button("Ask a question"):
     if ask_question_input != "":
         with st.spinner("Searching for answer..."):
-            xc = query_pinecone(ask_question_input)
-            transcriptions = get_transcriptions(xc)
-            st.write(transcriptions)
+            url = process_video(st.session_state.video_url)
+            # xc = query_pinecone(ask_question_input)
+            # transcriptions = get_transcriptions(xc)
+            # st.write(transcriptions)
     else:
         st.write("Please enter a question")
 
