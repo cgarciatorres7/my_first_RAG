@@ -2,7 +2,7 @@ import os
 import torch
 from pinecone import Pinecone
 from sentence_transformers import SentenceTransformer
-#from langchain_openai import OpenAI
+from openai import OpenAI
 
 # Initialize PyTorch
 torch.set_num_threads(1)  # Limit PyTorch to use only one thread
@@ -23,7 +23,7 @@ def query_pinecone(query: str):
 
     xq = model.encode([query]).tolist()
     # now query
-    query_results = index.query(vector=xq, top_k=3, include_metadata=True)
+    query_results = index.query(vector=xq, top_k=1, include_metadata=True)
     return query_results
 
 
@@ -53,7 +53,6 @@ def rag_promt(query: str, query_results: str) -> str:
 
 
 def chat_completion(prompt):
-    from openai import OpenAI
 
     # Get OpenAI api key from platform.openai.com
     openai_api_key = os.getenv('OPENAI_API_KEY')

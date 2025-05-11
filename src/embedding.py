@@ -37,7 +37,7 @@ def clip_audio_file(audio:str, id:str, time:int = 20)-> List[Dict]:
             "start_time" : i / 1000,
             "end_time" : (i + seconds) / 1000,
             "file_path" : file_handle.name,
-            "url" : f"https://www.youtube.com/watch?v={id}&t={i/1000}"
+            "url" : f"https://www.youtube.com/watch?v={id}&t={i/1000}s"
 
         })
 

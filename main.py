@@ -6,6 +6,7 @@ def main():
     answer = query_pinecone("Who is Matei Zaharia?")
     promt = rag_promt("Who is Matei Zaharia?", answer)
     response = chat_completion(promt)
+    print(response)
 
 if __name__ == "__main__":
     main()
