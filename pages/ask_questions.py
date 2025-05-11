@@ -1,18 +1,15 @@
 import streamlit as st
-from src.retriever import query_pinecone, rag_promt, chat_completion
+from src.retriever import query_pinecone, rag_promt
 from src.embedding import process_video
 
 
-main_header_message = None
-main_text_message = None
-
-if st.session_state.video_title:
+if st.session_state.video_url:
     main_header_message = st.session_state.video_title
     main_text_message = "You can now ask questions about the video"
 
 
 else:
-    main_text_message = "Youtube video title Loading"
+    main_header_message = "Youtube video title Loading"
     main_text_message = "Please go back and enter a YouTube URL in the search page first"
     
 main_header = st.header(main_header_message)
