@@ -38,6 +38,7 @@ if youtube_url != "":
         st.session_state.video_title = video_title
         st.session_state.video_url = youtube_url
         ASK_QUESTIONS_BUTTON_DISABLED = False
+        st.session_state.processed_video = False
     else:
         st.error("Could not get video title: Please enter a valid YouTube URL")
         

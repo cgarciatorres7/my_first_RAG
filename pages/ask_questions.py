@@ -1,5 +1,5 @@
 import streamlit as st
-from src.retriever import query_pinecone, rag_promt
+from src.retriever import query_pinecone, rag_promt, chat_completion
 from src.embedding import process_video
 
 
@@ -19,20 +19,21 @@ ask_question_input = st.text_input("Ask a question about the video", key="name2"
 if st.button("Ask a question"):
     if ask_question_input != "":
         with st.spinner("Searching for answer..."):
-            if 'processed_video' not in st.session_state:
+            if 'processed_video' not in st.session_state or st.session_state.processed_video == False:
+                print("Processing video")
                 url = process_video(st.session_state.video_url)
                 st.session_state.processed_video = True
             else:
                 print("Video already processed")
             answer = query_pinecone(ask_question_input)
             promt = rag_promt(ask_question_input, answer)
-            #response = chat_completion(promt)
-            st.write(answer.matches[0].metadata['text'])
+            response = chat_completion(promt)
+            st.write(response)
             st.write("--------------------------------")
             st.write("You can find the part of the video here:")
             st.write(answer.matches[0].metadata['url'])
             st.write("--------------------------------")
-            st.write(promt)
+            st.write(answer.matches[0].metadata['text'])
 
     else:
         st.write("Please enter a question")

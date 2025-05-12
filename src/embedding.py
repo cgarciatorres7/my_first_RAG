@@ -115,7 +115,6 @@ def process_video(input_video: str) -> None:
     embeddings = create_embeddings(transcriptions)
     formated_embeddings = format_embeddings(embeddings, transcriptions)
     create_vector_database(formated_embeddings)
-    
     print("Embeddings Created")
     
     return input_video

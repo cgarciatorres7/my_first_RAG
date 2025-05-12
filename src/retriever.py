@@ -63,7 +63,7 @@ def chat_completion(prompt):
     # Instructions
     sys_prompt = "You are a helpful assistant that always answers questions."
     res = client.chat.completions.create(
-        model='gpt-4o-mini-2024-07-18',
+        model='gpt-3.5-turbo-0125',
         messages=[
             {"role": "system", "content": sys_prompt},
             {"role": "user", "content": prompt}
