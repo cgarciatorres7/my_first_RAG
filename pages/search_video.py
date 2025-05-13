@@ -1,7 +1,7 @@
 import streamlit as st
 from pytubefix import YouTube
 from pytubefix.exceptions import RegexMatchError
-from src.embedding import process_video  # Add this import since you'll need it
+# Add this import since you'll need it
 
 def get_video_title(url: str) -> str:
     """

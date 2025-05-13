@@ -7,3 +7,5 @@ sentence-transformers~=3.4.1
 openai-whisper==20240930
 streamlit==1.44.1
 torch==2.2.1
+pinecone-client
+openai
