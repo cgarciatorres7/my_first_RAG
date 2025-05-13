@@ -24,7 +24,7 @@ def download_audio(url: str)-> Dict:
 
     return {"video_name" : yt.title, "id" : yt.video_id}
 
-def clip_audio_file(audio:str, id:str, time:int = 20)-> List[Dict]:
+def clip_audio_file(audio:str, id: str, time:int = 20)-> List[Dict]:
     seconds = time * 1000
     audio = AudioSegment.from_file(directories.raw / str(audio + ".m4a"), "m4a")
 
@@ -90,7 +90,6 @@ def format_embeddings(embeddings, metadata_list=None):
 
 
 def create_vector_database(embeddings: List[Dict]):
-    #todo finish vector database
     # Initialize Pinecone
 
     pc = Pinecone(PINECONE_API_KEY)

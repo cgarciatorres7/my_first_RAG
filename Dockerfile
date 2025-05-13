@@ -1,7 +1,9 @@
-FROM python:3.8-slim
+FROM python:3.11-slim
 
 # Set the working directory
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y ffmpeg
 
 # Install dependencies
 COPY requirements.txt .

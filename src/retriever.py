@@ -10,10 +10,11 @@ device = 'cpu'  # Always use CPU
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 # initialize connection to pinecone (get API key at app.pinecone.io)
-api_key = os.environ.get('PINECONE_API_KEY') or 'PINECONE_API_KEY'
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+openai_api_key = os.getenv('OPENAI_API_KEY')
 
 # configure client
-pc = Pinecone(api_key=api_key)
+pc = Pinecone(api_key=PINECONE_API_KEY)
 
 
 def query_pinecone(query: str):
@@ -53,9 +54,6 @@ def rag_promt(query: str, query_results: str) -> str:
 
 
 def chat_completion(prompt):
-
-    # Get OpenAI api key from platform.openai.com
-    openai_api_key = os.getenv('OPENAI_API_KEY')
 
     # Instantiate the OpenAI client
     client = OpenAI(api_key=openai_api_key)
