@@ -19,6 +19,7 @@ streamlit = "^1.44.0"
 torch = "^2.2.0"
 pinecone = "^7.0.0"
 openai = "^1.0.0"
+scipy = "^1.13.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"
