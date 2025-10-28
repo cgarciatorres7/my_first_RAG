@@ -51,12 +51,6 @@ def rag_prompt(query: str, query_results: Any) -> str:
         raise
 
 
-def rag_promt(query: str, query_results: Any) -> str:
-    """
-    Alias for rag_prompt (keeping for backward compatibility).
-    """
-    return rag_prompt(query, query_results)
-
 
 def chat_completion(prompt: str, model: str = 'gpt-3.5-turbo-0125') -> str:
     """

@@ -1,12 +1,20 @@
-from src.retriever import query_pinecone, rag_promt, chat_completion
+from src.embedding import process_video
+from src.retriever import query_pinecone
+from src.generation import complete_rag
 
 def main():
-    #process_video("https://www.youtube.com/watch?v=IELMSD2kdmk")
-    answer = query_pinecone("Who is Matei Zaharia?")
-    promt = rag_promt("Who is Matei Zaharia?", answer)
-    response = chat_completion(promt)
-    print(response)
+    video_url = input("Enter a YouTube video URL: ")
+    if video_url:
+        process_video(video_url)
+        question = input("Enter a question: ")
+        if question:
+            answer = query_pinecone(question)
+            response = complete_rag(query=question, query_results=answer)
+            print(response)
+        else:
+            print("No question provided")
+    else:
+        print("No video URL provided")
 
 if __name__ == "__main__":
     main()
-    
