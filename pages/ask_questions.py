@@ -19,7 +19,7 @@ ask_question_input = st.text_input("Ask a question about the video", key="name2"
 if st.button("Ask a question"):
     if ask_question_input != "":
         with st.spinner("Searching for answer..."):
-            if 'processed_video' not in st.session_state or st.session_state.processed_video == False:
+            if 'processed_video' not in st.session_state or not st.session_state.processed_video:
                 print("Processing video")
                 url = process_video(st.session_state.video_url)
                 st.session_state.processed_video = True

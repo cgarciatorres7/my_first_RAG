@@ -35,14 +35,14 @@ def rag_prompt(query: str, query_results: Any) -> str:
         
         # Create prompt template
         prompt_template = """
-Answer the question based on the following context from a video transcript.
-If you cannot answer the question based on the context, say "I cannot answer this based on the video content."
+        Answer the question based on the following context from a video transcript.
+        If you cannot answer the question based on the context, say "I cannot answer this based on the video content."
 
-Context: {context}
+        Context: {context}
 
-Question: {query}
+        Question: {query}
 
-Answer: """
+        Answer: """
         
         return prompt_template.format(context=context_str, query=query)
     

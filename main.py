@@ -1,4 +1,3 @@
-from src.embedding import process_video
 from src.retriever import query_pinecone, rag_promt, chat_completion
 
 def main():

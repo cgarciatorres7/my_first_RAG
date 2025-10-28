@@ -4,7 +4,6 @@ import torch
 from typing import List, Dict, Optional, Any
 from pinecone import Pinecone
 from sentence_transformers import SentenceTransformer
-from openai import OpenAI
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

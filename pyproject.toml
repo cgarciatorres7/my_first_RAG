@@ -21,6 +21,7 @@ pinecone = "^7.0.0"
 openai = "^1.0.0"
 scipy = "^1.13.1"
 llvmlite = "^0.43.0"
+ruff = "^0.14.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"
