@@ -24,14 +24,9 @@ cd my_first_RAG
 
 2. Create and activate a virtual environment:
 ```bash
-python -m venv env
-source env/bin/activate  # On Windows, use `env\Scripts\activate`
+poetry install   # On Windows, use `env\Scripts\activate`
 ```
 
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
 
 ## Configuration
 
@@ -40,8 +35,6 @@ pip install -r requirements.txt
 OPENAI_API_KEY=your_openai_api_key
 PINECONE_API_KEY=your_pinecone_api_key
 ```
-
-2. Update `config.yaml` with your specific configuration settings.
 
 ## Usage
 
@@ -61,16 +54,21 @@ streamlit run app.py
 
 ```
 my_first_RAG/
-├── app.py              # Main Streamlit application
-├── main.py            # Core application logic
-├── requirements.txt   # Python dependencies
-├── Dockerfile        # Container configuration
-├── config/           # Configuration files
-├── data/            # Data storage
-├── notebooks/       # Jupyter notebooks
-├── pages/          # Streamlit pages
-└── src/            # Source code
+├── app.py                # Entry point for Streamlit app
+├── main.py               # CLI-based main logic for video QA
+├── Dockerfile            # Container configuration
+├── config/               # Configuration files (e.g., secrets, environment)
+├── data/                 # Downloaded videos, processed audio, etc.
+├── notebooks/            # Experimentation and prototyping notebooks
+├── pages/                # Additional Streamlit app pages
+└── src/                  # Core source code
+    ├── embedding.py      # Video/audio embedding & preprocessing logic
+    ├── generation.py     # Generation & RAG completion logic
+    └── retriever.py      # Pinecone query and retrieval utilities
+├── poetry.lock
+└── pyproject.toml 
 ```
+
 
 ## Development
 
